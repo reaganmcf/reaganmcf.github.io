@@ -32,9 +32,9 @@ show_tags = true
 
 theme_color = "orange"
 
-show_menu_items = 2
+show_menu_items = 4
 
-center = false
+center = true
 
 logo_text = "rmcf"
 
@@ -42,7 +42,8 @@ logo_home_link = "/"
 
 main_menu = [
     { url = "/about/", name = "about" },
-    { url = "/blog/", name = "blog" }
+    { url = "/", name = "blog" },
+    { url = "/projects", name = "projects" }
 ]
 
 menu_more = "show more"
