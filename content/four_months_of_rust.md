@@ -1,7 +1,7 @@
 +++
 title="4 months of Rust - what I've learned"
 description="I started learning and using Rust just under 4 months ago. After reading a few books, watching hundreds of videos, and many projects later, here is what I have learned."
-date=2019-07-16
+date=2019-07-17
 
 [taxonomies]
 tags = ["rust", "review"]
