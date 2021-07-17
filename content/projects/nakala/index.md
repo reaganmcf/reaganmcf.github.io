@@ -1,12 +1,14 @@
 +++
 title="nakala"
 description="A hobby programming language in Rust"
-date=2019-07-15
+date=2021-07-01
 
 [taxonomies]
 tags = ["rust", "nakala", "programming languages"]
 categories = ["rust"]
 +++
+
+[repository](https://github.com/reaganmcf/nakala)
 
 # nakala
 

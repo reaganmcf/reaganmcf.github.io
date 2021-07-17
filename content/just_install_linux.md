@@ -1,7 +1,7 @@
 +++
 title="Just install Linux for a bit. You won't regret it"
 description="As a person who is a tinkerer and loves learning about tech, switching to Linux for a few months was one of the best decisions I have ever made. Here is why you should too"
-date=2019-07-16
+date=2021-07-16
 
 [taxonomies]
 tags = ["linux", "os"]
