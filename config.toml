@@ -40,6 +40,8 @@ logo_text = "rmcf"
 
 logo_home_link = "/"
 
+og_preview_img = "preview_img.png"
+
 main_menu = [
     { url = "/about/", name = "about" },
     { url = "/", name = "blog" },
