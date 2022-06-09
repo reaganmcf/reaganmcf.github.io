@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>Memory Arenas - a Rust programmer&#x27;s best friend - Reagan McFarland</title>
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content=""/>
+
+    <meta property="og:title" content="
+    reaganmcf -&nbsp;Memory Arenas - a Rust programmer&#x27;s best friend" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;memory-arenas&#x2F;"/>
+    <meta property="og:description" content="As an intermediate Rust programmer, one data structure I find myself using time and time again in my Rust projects is the Memory. In other languages, this data structure doesn&#x27;t have as much usefulness, but I have found it to be a real superstar in Rust."/><meta property="og:image" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+        <meta property="twitter:card" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+    <link rel="preload" href="/assets/fonts/FiraCode-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/assets/fonts/FiraCode-Bold.woff" as="font" type="font/woff" crossorigin>
+
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;style.css">
+    <link rel="stylesheet" href=" https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;color&#x2F;orange.css">
+    
+</head>
+    <body>
+        <div class="container center">
+<header class="header">
+    <div class="header__inner">
+        <div class="header__logo">
+            <a href="&#x2F;">
+    <div class="logo">
+        rmcf
+    </div>
+</a>
+        </div>
+        <div class="menu-trigger">menu</div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu__inner menu__inner--desktop">
+            
+            
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+                    </li>
+                
+            </ul>
+
+        <ul class="menu__inner menu__inner--mobile">
+            
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+        </li>
+        </ul>
+    </nav>
+
+    </header>
+<div class="content"><div class="post">
+        <h1 class="post-title">
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;memory-arenas&#x2F;">Memory Arenas - a Rust programmer&#x27;s best friend</a>
+        </h1>
+        
+    <div class="post-meta">
+        <span class="post-date">2022.06.09
+                </span>
+
+        <span class="post-author"></span>
+
+        
+
+    
+    :: {<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;categories&#x2F;programming&#x2F;">programming</a>} 
+
+            
+    ::
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;rust&#x2F;">rust</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;memory-arenas&#x2F;">memory-arenas</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;intermediate&#x2F;">intermediate</a>
+        
+    
+            
+        
+    </div>
+
+
+
+        
+
+        <div class="post-content">
+            <p>As an intermediate Rust programmer, one data structure I find myself using time and time again in my Rust projects is the Memory Arena. In other languages, this data structure doesn't have as much usefulness, but I have found it to be a real superstar in my Rust projects.</p>
+<h2 id="what-is-it">What is it?<a class="zola-anchor" href="#what-is-it" aria-label="Anchor link for: what-is-it">§</a>
+</h2>
+<p>A Memory Arena is a data structure that, in its most abstract sense, is just a large contiguous piece of memory. In Rust, this is often just a <code>Vec</code> of some type <code>T</code> where instead of exposing <code>&amp;T</code> and <code>&amp;mut T</code>, you return 'keys' (usually indices) to items in the <code>Vec</code>. </p>
+<p>The benefit of this might not be directly apparent and seems like it might just make our API a little more verbose. But to understand the usefulness of memory arenas, I'll walk through a problem in my programming language <a href="https://github.com/nakala-lang/nakala">nakaka</a>, and discuss how memory arenas were the perfect solution.</p>
+<h3 id="the-idea">The Idea<a class="zola-anchor" href="#the-idea" aria-label="Anchor link for: the-idea">§</a>
+</h3>
+<p>Often when you are writing an interpreter for a programming language, you're dealing with &quot;scopes&quot; which can be nested.</p>
+<p>Scopes just provide a way to define new variables and look up the values for existing variables. Let's define some <code>Scope</code> and <code>Value</code> structs for this subset of nakala to paint a better picture:</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fdf4c1aa;">#[</span><span style="color:#fdf4c1;">derive</span><span style="color:#fdf4c1aa;">(Clone)]
+</span><span style="color:#fa5c4b;">pub enum </span><span style="color:#8ec07c;">Value </span><span style="color:#fdf4c1aa;">{
+  Int(</span><span style="color:#fa5c4b;">i64</span><span style="color:#fdf4c1aa;">),
+  Bool(</span><span style="color:#fa5c4b;">bool</span><span style="color:#fdf4c1aa;">),
+  </span><span style="color:#fe8019;">...
+</span><span style="color:#fdf4c1aa;">}
+
+</span><span style="color:#fa5c4b;">struct </span><span style="color:#8ec07c;">Scope </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fdf4c1;">values</span><span style="color:#fdf4c1aa;">: HashMap&lt;</span><span style="color:#fabd2f;">String</span><span style="color:#fdf4c1aa;">, Value&gt;
+}
+
+</span><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Scope </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">new</span><span style="color:#fdf4c1aa;">() -&gt; </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+    </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+      values: HashMap::default(),
+    }
+  }
+}
+</span></code></pre>
+<p>Let's also define the <code>RuntimeError</code> type that we will use in <code>get</code>, <code>define</code>, and <code>assign</code></p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">pub enum </span><span style="color:#8ec07c;">RuntimeError </span><span style="color:#fdf4c1aa;">{
+  UndefinedVariable,
+  VariableAlreadyExists
+}
+</span></code></pre>
+<p>Lastly, let's define the <code>get</code>, <code>assign</code>, and <code>define</code> functions for our Scope</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Scope </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fe8019;">...</span><span style="color:#fdf4c1aa;">,
+  
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">get</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1aa;">String) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;Value, RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(entry) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(name) {
+      </span><span style="color:#fa5c4b;">return </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(entry.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">());
+    }
+
+    </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::UndefinedVariable)
+  }
+  
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">assign</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fdf4c1aa;">Entry::Occupied(</span><span style="color:#fa5c4b;">mut</span><span style="color:#fdf4c1aa;"> e) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">entry</span><span style="color:#fdf4c1aa;">(name) {
+      e.</span><span style="color:#fabd2f;">insert</span><span style="color:#fdf4c1aa;">(val);
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::UndefinedVariable)
+    }
+  }
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">define</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fdf4c1aa;">Entry::Vacant(e) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">entry</span><span style="color:#fdf4c1aa;">(name) {
+      e.</span><span style="color:#fabd2f;">insert</span><span style="color:#fdf4c1aa;">(val);
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::VariableAlreadyExists)
+    }
+  }
+}
+</span></code></pre>
+<p>Now we have some <code>Scope</code> that we can get, assign, and define variables inside - pretty neat! However, there is a core problem</p>
+<h3 id="the-problem">The Problem<a class="zola-anchor" href="#the-problem" aria-label="Anchor link for: the-problem">§</a>
+</h3>
+<p>Let's look at the following example:</p>
+<pre style="background-color:#282828;">
+<code class="language-js" data-lang="js"><span style="color:#fa5c4b;">let </span><span style="color:#fdf4c1;">x </span><span style="color:#fe8019;">= </span><span style="color:#d3869b;">10</span><span style="color:#fdf4c1aa;">;
+</span><span style="color:#fa5c4b;">if </span><span style="color:#fdf4c1;">someCondition </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fdf4c1;">x </span><span style="color:#fe8019;">= </span><span style="color:#d3869b;">5</span><span style="color:#fdf4c1aa;">;
+}
+</span></code></pre>
+<p>Let's visualize what these scopes look like by the time it's about to evaluate <code>x = 5</code>;</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">  ┌─────────────────────┐
+  │Scope 1              │
+  │  - x = Val::Int(10) │
+  └─────────────────────┘
+
+  ┌─────────────────────┐
+  │Scope 2              │
+  └─────────────────────┘
+</span></code></pre>
+<p>As you can see Scope 2 does not know that <code>x</code> is a variable, and it will end up returning <code>RuntimeError::UndefinedVariable</code>. </p>
+<p>What we want is something like this:</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">  ┌────────────────────┐
+  │Scope 1             │
+  │  - x = Val::Int(10)│
+  └─────────▲──────────┘
+            │
+            │ (enclosed by)
+  ┌─────────┴──────────┐
+  │Scope 2             │
+  └────────────────────┘
+</span></code></pre>
+<p>With this new design, we would be able to recursively <code>get</code>, <code>assign</code> and <code>define</code> no matter how deeply the scope is nested.</p>
+<p>To do this, we need a way to &quot;enclose&quot; the new scope with the current scope before interpreting the body of the if statement. Let's redo our <code>Scope</code> struct</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">struct </span><span style="color:#8ec07c;">Scope </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fdf4c1;">values</span><span style="color:#fdf4c1aa;">: HashMap&lt;</span><span style="color:#fabd2f;">String</span><span style="color:#fdf4c1aa;">, Value&gt;,
+  </span><span style="color:#fdf4c1;">enclosing</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fabd2f;">Option</span><span style="color:#fdf4c1aa;">&lt;</span><span style="color:#fabd2f;">Box</span><span style="color:#fdf4c1aa;">&lt;</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut</span><span style="color:#fdf4c1aa;"> Scope&gt;&gt;
+}
+
+</span><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Struct </span><span style="color:#fdf4c1aa;">{ 
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">new</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fdf4c1;">enclosing</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fabd2f;">Option</span><span style="color:#fdf4c1aa;">&lt;</span><span style="color:#fabd2f;">Box</span><span style="color:#fdf4c1aa;">&lt;</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut</span><span style="color:#fdf4c1aa;"> Scope&gt;&gt;) -&gt; </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+    values: HashMap::default(),
+    enclosing
+  }
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">get</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1aa;">String) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;Value, RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(entry) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(name) {
+      </span><span style="color:#fa5c4b;">return </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(entry.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">());
+    }
+
+    </span><span style="font-style:italic;color:#928374;">// Recursively lookup in enclosing scope
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.enclosing {
+      enclosing.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(name)
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::UndefinedVariable)
+    }
+  }
+  
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">assign</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fdf4c1aa;">Entry::Occupied(</span><span style="color:#fa5c4b;">mut</span><span style="color:#fdf4c1aa;"> e) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">entry</span><span style="color:#fdf4c1aa;">(name) {
+      e.</span><span style="color:#fabd2f;">insert</span><span style="color:#fdf4c1aa;">(val);
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="font-style:italic;color:#928374;">// Recursively lookup in enclosing scope
+      </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.enclosing {
+        enclosing.</span><span style="color:#fabd2f;">assign</span><span style="color:#fdf4c1aa;">(name, val)
+      } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+        </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::UndefinedVariable)
+      }
+    }
+  }
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">define</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fdf4c1aa;">Entry::Vacant(e) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">entry</span><span style="color:#fdf4c1aa;">(name) {
+      e.</span><span style="color:#fabd2f;">insert</span><span style="color:#fdf4c1aa;">(val);
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="font-style:italic;color:#928374;">// Recursively lookup in enclosing scope
+      </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.enclosing {
+        enclosing.</span><span style="color:#fabd2f;">define</span><span style="color:#fdf4c1aa;">(name, val)
+      } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+        </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::VariableAlreadyExists)
+      }
+    }
+  }
+}
+</span></code></pre>
+<p>Now we have borrow checker errors everywhere because we have to annotate the lifetime of the <code>Box&lt;&amp;mut Scope&gt;</code> inside the <code>Struct</code> definition.</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">   Compiling playground v0.0.1 (/playground)
+error[E0425]: cannot find value `enclosing` in this scope
+  --&gt; src/main.rs:25:7
+   |
+25 |       enclosing
+   |       ^^^^^^^^^ not found in this scope
+
+error[E0106]: missing lifetime specifier
+  --&gt; src/main.rs:18:25
+   |
+18 |   enclosing: Option&lt;Box&lt;&amp;Scope&gt;&gt;
+   |                         ^ expected named lifetime parameter
+   |
+help: consider introducing a named lifetime parameter
+   |
+16 ~ struct Scope&lt;&#39;a&gt; {
+17 |   values: HashMap&lt;String, Value&gt;,
+18 ~   enclosing: Option&lt;Box&lt;&amp;&#39;a Scope&gt;&gt;
+</span></code></pre>
+<p>A full disclaimer here - I am not a Rust expert by any means, but I have probably spent 5 hours alone trying to get this design to comply with the borrow checker and failed. I also asked the Rust discord for help for over an hour and they could not help me. </p>
+<p>The main reason this is so hard is that you have to <strong>prove that the enclosing scope <em>always</em> lives longer than the scope itself</strong>, which is hard to encode in lifetimes. At least for a mere mortal like me :).</p>
+<p>But don't fret - we have memory arenas!</p>
+<h3 id="the-solution">The Solution<a class="zola-anchor" href="#the-solution" aria-label="Anchor link for: the-solution">§</a>
+</h3>
+<p>What we want is some data structure that allows us to reference a scope from wherever, and do &quot;stuff&quot; with that scope later on. We can use a memory arena!</p>
+<p>Instead of having direct mutable references to the scopes, we will instead hand out <code>ScopeId</code>s which will index into our memory arena of scopes. This way the arena will &quot;own&quot; the memory for the duration of the program, and we can indirectly hand out more than one mutable reference to the same memory location.</p>
+<p>In our interpreter, we will be passing around a new data structure, our <code>Environment</code> which will abstract away the memory arena implementation for the most part.</p>
+<p>Let's start with our new <code>Scope</code> and <code>ScopeId</code> definitions:</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">type </span><span style="color:#8ec07c;">ScopeId </span><span style="color:#fe8019;">= </span><span style="color:#fa5c4b;">usize</span><span style="color:#fdf4c1aa;">;
+
+</span><span style="color:#fa5c4b;">struct </span><span style="color:#8ec07c;">Scope </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fa5c4b;">pub </span><span style="color:#fdf4c1;">id</span><span style="color:#fdf4c1aa;">: ScopeId,
+  </span><span style="color:#fdf4c1;">values</span><span style="color:#fdf4c1aa;">: HashMap&lt;</span><span style="color:#fabd2f;">String</span><span style="color:#fdf4c1aa;">, Value&gt;,
+  </span><span style="color:#fa5c4b;">pub </span><span style="color:#fdf4c1;">enclosing</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fabd2f;">Option</span><span style="color:#fdf4c1aa;">&lt;ScopeId&gt;
+}
+</span></code></pre>
+<p>We now reference a Scope via an unsized integer, or <code>ScopeId</code>.</p>
+<p>Our <code>get</code>, <code>assign</code> and <code>define</code> functions are back to what they were in our first iteration:</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Scope </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">new</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fdf4c1;">id</span><span style="color:#fdf4c1aa;">: ScopeId, </span><span style="color:#fdf4c1;">enclosing</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fabd2f;">Option</span><span style="color:#fdf4c1aa;">&lt;ScopeId&gt;) -&gt; </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+    </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+      id,
+      values: HashMap::default(),
+      enclosing
+    }
+  }
+  
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">get</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1aa;">String) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;Value, RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(entry) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(name) {
+      </span><span style="color:#fa5c4b;">return </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(entry.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">());
+    }
+
+    </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::UndefinedVariable)
+  }
+  
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">assign</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fdf4c1aa;">Entry::Occupied(</span><span style="color:#fa5c4b;">mut</span><span style="color:#fdf4c1aa;"> e) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">entry</span><span style="color:#fdf4c1aa;">(name) {
+      e.</span><span style="color:#fabd2f;">insert</span><span style="color:#fdf4c1aa;">(val);
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::UndefinedVariable)
+    }
+  }
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">define</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="color:#fa5c4b;">if let </span><span style="color:#fdf4c1aa;">Entry::Vacant(e) </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.values.</span><span style="color:#fabd2f;">entry</span><span style="color:#fdf4c1aa;">(name) {
+      e.</span><span style="color:#fabd2f;">insert</span><span style="color:#fdf4c1aa;">(val);
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(RuntimeError::VariableAlreadyExists)
+    }
+  }
+}
+</span></code></pre>
+<p>Now let's define our <code>Environment</code></p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">pub struct </span><span style="color:#8ec07c;">Environment </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fdf4c1;">scopes</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fabd2f;">Vec</span><span style="color:#fdf4c1aa;">&lt;Scope&gt;, </span><span style="font-style:italic;color:#928374;">// our scope memory arena!
+  </span><span style="color:#fdf4c1;">next_scope_id</span><span style="color:#fdf4c1aa;">: ScopeId
+}
+
+</span><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Environment </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">new</span><span style="color:#fdf4c1aa;">() -&gt; </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+    </span><span style="color:#fa5c4b;">Self </span><span style="color:#fdf4c1aa;">{
+      scopes: </span><span style="color:#fabd2f;">vec!</span><span style="color:#fdf4c1aa;">[Scope::new(</span><span style="color:#d3869b;">0</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fabd2f;">None</span><span style="color:#fdf4c1aa;">)], </span><span style="font-style:italic;color:#928374;">// Global scope
+</span><span style="color:#fdf4c1aa;">      next_scope_id: </span><span style="color:#d3869b;">1
+    </span><span style="color:#fdf4c1aa;">}
+  }
+}
+</span></code></pre>
+<p>Our interpreter will want a way to be able to begin and end scopes as it walks our AST, so let's add those functions to our API.</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Environment </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fe8019;">...</span><span style="color:#fdf4c1aa;">,
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">begin_scope</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, </span><span style="color:#fdf4c1;">enclosing</span><span style="color:#fdf4c1aa;">: ScopeId) -&gt; ScopeId {
+    </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> id </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.next_scope_id;
+    </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.next_scope_id </span><span style="color:#fe8019;">+= </span><span style="color:#d3869b;">1</span><span style="color:#fdf4c1aa;">;
+    
+    </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.scopes.</span><span style="color:#fabd2f;">push</span><span style="color:#fdf4c1aa;">(Scope::new(id, </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing)));
+
+    id
+  }
+}
+</span></code></pre>
+<p>Notice how <code>begin_scope</code> returns a <code>ScopeId</code>. Instead of returning a <code>&amp;mut Scope</code>, it returns this Id which it will then use to perform <code>get</code>, <code>assign</code> and <code>define</code>, like so:</p>
+<pre style="background-color:#282828;">
+<code class="language-rs" data-lang="rs"><span style="color:#fa5c4b;">impl </span><span style="color:#8ec07c;">Environment </span><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#fe8019;">...</span><span style="color:#fdf4c1aa;">,
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">get</span><span style="color:#fdf4c1aa;">(
+    </span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, 
+    </span><span style="color:#fdf4c1;">scope_id</span><span style="color:#fdf4c1aa;">: ScopeId, 
+    </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fe8019;">&amp;</span><span style="color:#fdf4c1aa;">String
+  ) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;Value, RuntimeError&gt; {
+    </span><span style="font-style:italic;color:#928374;">// SAFETY: Should never have an invalid scope_id
+    </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> scope </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.scopes.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(scope_id).</span><span style="color:#fabd2f;">unwrap</span><span style="color:#fdf4c1aa;">();
+
+    </span><span style="color:#fa5c4b;">match</span><span style="color:#fdf4c1aa;"> scope.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(name) {
+      </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(v) </span><span style="color:#fe8019;">=&gt; </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(v),
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(e) </span><span style="color:#fe8019;">=&gt; </span><span style="color:#fdf4c1aa;">{
+        </span><span style="font-style:italic;color:#928374;">// recursively call enclosing scope
+        </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing_id) </span><span style="color:#fe8019;">=</span><span style="color:#fdf4c1aa;"> scope.enclosing {
+          </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.</span><span style="color:#fabd2f;">get</span><span style="color:#fdf4c1aa;">(enclosing_id, name)
+        } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+          </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(e)
+        }
+      }
+    }
+  }
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">assign</span><span style="color:#fdf4c1aa;">(
+    </span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, 
+    </span><span style="color:#fdf4c1;">scope_id</span><span style="color:#fdf4c1aa;">: ScopeId, 
+    </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, 
+    </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value
+  ) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="font-style:italic;color:#928374;">// SAFETY: Should never have an invalid scope_id
+    </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> scope </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.scopes.</span><span style="color:#fabd2f;">get_mut</span><span style="color:#fdf4c1aa;">(scope_id).</span><span style="color:#fabd2f;">unwrap</span><span style="color:#fdf4c1aa;">();
+
+    </span><span style="color:#fa5c4b;">match</span><span style="color:#fdf4c1aa;"> scope.</span><span style="color:#fabd2f;">assign</span><span style="color:#fdf4c1aa;">(name.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">(), val.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">()) {
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(e) </span><span style="color:#fe8019;">=&gt; </span><span style="color:#fdf4c1aa;">{
+        </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing_id) </span><span style="color:#fe8019;">=</span><span style="color:#fdf4c1aa;"> scope.enclosing {
+          </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.</span><span style="color:#fabd2f;">assign</span><span style="color:#fdf4c1aa;">(enclosing_id, name, val)
+        } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+          </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(e)
+        }
+      }
+      </span><span style="color:#fe8019;">_ =&gt; </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    }
+  }
+
+  </span><span style="color:#fa5c4b;">pub fn </span><span style="color:#8ec07c;">define</span><span style="color:#fdf4c1aa;">(
+    </span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">, 
+    </span><span style="color:#fdf4c1;">scope_id</span><span style="color:#fdf4c1aa;">: ScopeId, 
+    </span><span style="color:#fdf4c1;">name</span><span style="color:#fdf4c1aa;">: String, 
+    </span><span style="color:#fdf4c1;">val</span><span style="color:#fdf4c1aa;">: Value
+  ) -&gt; </span><span style="color:#fabd2f;">Result</span><span style="color:#fdf4c1aa;">&lt;(), RuntimeError&gt; {
+    </span><span style="font-style:italic;color:#928374;">// SAFETY: Should never have an invalid scope_id
+    </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> scope </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.scopes.</span><span style="color:#fabd2f;">get_mut</span><span style="color:#fdf4c1aa;">(scope_id).</span><span style="color:#fabd2f;">unwrap</span><span style="color:#fdf4c1aa;">();
+
+    </span><span style="color:#fa5c4b;">match</span><span style="color:#fdf4c1aa;"> scope.</span><span style="color:#fabd2f;">define</span><span style="color:#fdf4c1aa;">(name.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">(), val.</span><span style="color:#fabd2f;">clone</span><span style="color:#fdf4c1aa;">()) {
+      </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(e) </span><span style="color:#fe8019;">=&gt; </span><span style="color:#fdf4c1aa;">{
+        </span><span style="color:#fa5c4b;">if let </span><span style="color:#fabd2f;">Some</span><span style="color:#fdf4c1aa;">(enclosing_id) </span><span style="color:#fe8019;">=</span><span style="color:#fdf4c1aa;"> scope.enclosing {
+          </span><span style="color:#fdf4c1;">self</span><span style="color:#fdf4c1aa;">.</span><span style="color:#fabd2f;">assign</span><span style="color:#fdf4c1aa;">(enclosing_id, name, val)
+        } </span><span style="color:#fa5c4b;">else </span><span style="color:#fdf4c1aa;">{
+          </span><span style="color:#fabd2f;">Err</span><span style="color:#fdf4c1aa;">(e)
+        }
+      }
+      </span><span style="color:#fe8019;">_ =&gt; </span><span style="color:#fabd2f;">Ok</span><span style="color:#fdf4c1aa;">(())
+    }
+  }
+}
+</span></code></pre>
+<p>And that's it! This is the API that <a href="https://github.com/nakala-lang/nakala">nakala</a> uses for its scoping. This API is powerful enough to handle first-class functions, closures, and <code>this</code> binding for functions. Even if can get the lifetime annotations to work, I doubt you will be able to get all those features with lifetime annotations.</p>
+<h2 id="conclusion">Conclusion<a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion">§</a>
+</h2>
+<p>Memory Arenas are a simple yet incredibly powerful tool every intermediate to advanced Rust programmer should have in their back pocket. Lots of open source projects use this throughout the codebase for when you need multiple things to have mutable access to the same location in memory (not concurrently!).</p>
+<p>The astute readers might have noticed there is no <code>delete_scope</code> function in the <code>Environment</code> impl block. Since our keys to the memory arena are indices, we can't resize or remove dead scopes without invalidating every other key. The solution involves using some sort of generational vector data structure, which I will address in part 2.</p>
+
+        </div>
+        
+    
+</div></div>
+            
+    <div class="pagination">
+        <div class="pagination__buttons">
+            </div>
+    </div>
+<footer class="footer">
+                    <div class="footer__inner"><div class="copyright">
+            <span>© 2022 <a href="https://github.com/ejmg/zerm">zerm</a> :: Powered by <a href="https://www.getzola.org/">Zola</a></span>
+            <span>:: Theme made by <a href="https://github.com/ejmg">ejmg</a></span>
+        </div>
+    <script type="text/javascript" src="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;assets&#x2F;js&#x2F;main.js"></script>
+</div>
+                    
+
+                </footer></div>
+    </body>
+</html>

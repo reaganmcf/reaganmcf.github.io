@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>lightmon - Reagan McFarland</title>
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content=""/>
+
+    <meta property="og:title" content="
+    reaganmcf -&nbsp;lightmon" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;lightmon&#x2F;"/>
+    <meta property="og:description" content="A lightweight, cross-platform, language-agnostic &#x27;run code on file change&#x27; tool, inspired by Nodemon"/><meta property="og:image" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+        <meta property="twitter:card" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+    <link rel="preload" href="/assets/fonts/FiraCode-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/assets/fonts/FiraCode-Bold.woff" as="font" type="font/woff" crossorigin>
+
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;style.css">
+    <link rel="stylesheet" href=" https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;color&#x2F;orange.css">
+    
+</head>
+    <body>
+        <div class="container center">
+<header class="header">
+    <div class="header__inner">
+        <div class="header__logo">
+            <a href="&#x2F;">
+    <div class="logo">
+        rmcf
+    </div>
+</a>
+        </div>
+        <div class="menu-trigger">menu</div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu__inner menu__inner--desktop">
+            
+            
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+                    </li>
+                
+            </ul>
+
+        <ul class="menu__inner menu__inner--mobile">
+            
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+        </li>
+        </ul>
+    </nav>
+
+    </header>
+<div class="content"><div class="post">
+        <h1 class="post-title">
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;lightmon&#x2F;">lightmon</a>
+        </h1>
+        
+    <div class="post-meta">
+        <span class="post-date">2021.03.31
+                </span>
+
+        <span class="post-author"></span>
+
+        
+
+    
+    :: {<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;categories&#x2F;rust&#x2F;">rust</a>} 
+
+            
+    ::
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;rust&#x2F;">rust</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;lightmon&#x2F;">lightmon</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;cli-tools&#x2F;">cli tools</a>
+        
+    
+            
+        
+    </div>
+
+
+
+        
+
+        <div class="post-content">
+            <p><a href="https://github.com/reaganmcf/lightmon">respository</a></p>
+<p align="center">
+  <img height="250px" src="https://raw.githubusercontent.com/reaganmcf/lightmon/master/assets/logo.png"/>
+</p>
+<h1 id="lightmon">lightmon<a class="zola-anchor" href="#lightmon" aria-label="Anchor link for: lightmon">§</a>
+</h1>
+<p>A lightweight, cross-platform, language-agnostic &quot;run code on file change&quot; tool, inspired by Nodemon</p>
+<h3 id="why-lightmon-over-nodemon">Why lightmon over nodemon?<a class="zola-anchor" href="#why-lightmon-over-nodemon" aria-label="Anchor link for: why-lightmon-over-nodemon">§</a>
+</h3>
+<p>There are many reasons to use lightmon over nodemon: <strong>it's faster, lighter, and can be used for all types of projects</strong>. Not only this, but lightmon is a <strong>drag and drop  replacement</strong> for projects that use <code>nodemon</code> because lightman can parse existing <code>nodemon.json</code> config files.</p>
+<ul>
+<li>Note: <a href="https://github.com/reaganmcf/lightmon/issues/3">Parse nodemon.json config is still WIP</a></li>
+</ul>
+<h2 id="usage">Usage<a class="zola-anchor" href="#usage" aria-label="Anchor link for: usage">§</a>
+</h2>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">lightmon
+</span></code></pre>
+<p>By default, <code>lightmon</code> will automatically determine what kind of files it should watch based upon your project structure. For example, if a <code>node_modules</code> folder is present in the directory, <code>lightmon</code> will run in the <code>node</code> configuration, parsing your <code>package.json</code> to infer the correct command to run.</p>
+<h2 id="supported-languages">Supported languages<a class="zola-anchor" href="#supported-languages" aria-label="Anchor link for: supported-languages">§</a>
+</h2>
+<p>Watch patterns are the file patterns that lightmon will watch for file changes, and Exec commands are the list of commands that are executed when those events happen.</p>
+<h3 id="rust">Rust<a class="zola-anchor" href="#rust" aria-label="Anchor link for: rust">§</a>
+</h3>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">lightmon rust [cargo_subcommand]? [cargo_subcommand_args]?
+</span></code></pre><h5 id="watch-patterns">Watch Patterns<a class="zola-anchor" href="#watch-patterns" aria-label="Anchor link for: watch-patterns">§</a>
+</h5>
+<p>[<code>Cargo.toml</code>, <code>.rs</code>]</p>
+<h5 id="exec-commands">Exec Commands<a class="zola-anchor" href="#exec-commands" aria-label="Anchor link for: exec-commands">§</a>
+</h5>
+<p>By default, the <code>rust</code> configuration will set the Exec command to <code>cargo run</code> if it's a binary project, and <code>cargo test</code> if it's a library.</p>
+<p>However, you can override this behavior by specifying any valid cargo subcommand (and any arguments). For example, if you wanted to run <code>cargo build --bin my_bin --all-targets</code>, you can run the following:</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">lightmon rust build --bin my_bin --all-targets
+</span></code></pre>
+<p>Refer to <code>lightmon help rust</code> for more information.</p>
+<h3 id="node-js">Node.js<a class="zola-anchor" href="#node-js" aria-label="Anchor link for: node-js">§</a>
+</h3>
+<p><em>Note: This configuration also works for React, React-Native, TypeScript, etc. i.e.: anything with a package.json!</em></p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">lightmon node
+</span></code></pre><h5 id="watch-patterns-1">Watch Patterns<a class="zola-anchor" href="#watch-patterns-1" aria-label="Anchor link for: watch-patterns-1">§</a>
+</h5>
+<p>[<code>.jsx</code>, <code>.js</code>, <code>.css</code>, <code>.html</code>]</p>
+<h5 id="exec-commands-1">Exec Commands<a class="zola-anchor" href="#exec-commands-1" aria-label="Anchor link for: exec-commands-1">§</a>
+</h5>
+<p>If there is a package.json in the root directory, lightmon attempts to resolve the exec command in the following order:</p>
+<ul>
+<li>The value at <code>scripts.start</code></li>
+<li><code>node main</code> where main is the value of the main key in package.json (the entry point of the project).</li>
+</ul>
+<p><strong>NOTE:</strong> The Exec command will fallback to <code>node index.js</code> if all of the above fail.</p>
+<p>For example, the following package.json will result in the Exec command resolving to <code>react-scripts start</code>:</p>
+<pre style="background-color:#282828;">
+<code class="language-json" data-lang="json"><span style="color:#fdf4c1aa;">{
+  </span><span style="color:#b8bb26;">&quot;name&quot;</span><span style="color:#fdf4c1aa;">: </span><span style="color:#b8bb26;">&quot;calculator&quot;</span><span style="color:#fdf4c1aa;">,
+  </span><span style="color:#b8bb26;">&quot;main&quot;</span><span style="color:#fdf4c1aa;">: </span><span style="color:#b8bb26;">&quot;index.js&quot;</span><span style="color:#fdf4c1aa;">,
+  </span><span style="color:#b8bb26;">&quot;scripts&quot;</span><span style="color:#fdf4c1aa;">: {
+    </span><span style="color:#b8bb26;">&quot;start&quot;</span><span style="color:#fdf4c1aa;">: </span><span style="color:#b8bb26;">&quot;react-scripts start&quot;</span><span style="color:#fdf4c1aa;">,
+    </span><span style="color:#b8bb26;">&quot;build&quot;</span><span style="color:#fdf4c1aa;">: </span><span style="color:#b8bb26;">&quot;react-scripts build&quot;
+  </span><span style="color:#fdf4c1aa;">}
+}
+</span></code></pre><h3 id="c-c">C/C++<a class="zola-anchor" href="#c-c" aria-label="Anchor link for: c-c">§</a>
+</h3>
+<p>It's very tricky to infer what the patterns and exec commands could be, so we recommend using <code>shell</code> mode with a custom script (see below).</p>
+<h3 id="shell-for-unsupported-languages-or-complicated-builds">Shell (for unsupported languages or complicated builds)<a class="zola-anchor" href="#shell-for-unsupported-languages-or-complicated-builds" aria-label="Anchor link for: shell-for-unsupported-languages-or-complicated-builds">§</a>
+</h3>
+<p><code>lightmon shell -s &lt;path&gt; -w &lt;patterns&gt;</code>
+Here users can specify the path to the shell script and which file types to watch for seperated by commas.</p>
+<p>For example, let's say you have a python project with a file named <code>start.py</code> at the root of the project. Whenever you edit any <code>.py</code> files in the project, you want to
+re-run <code>python start.py</code>. To accomplish this, you could create a simple script called <code>run.sh</code> with the following contents:</p>
+<pre style="background-color:#282828;">
+<code class="language-sh" data-lang="sh"><span style="color:#fdf4c1;">python start.py
+</span></code></pre>
+<p>Now, you just run the following:</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">lightmon shell -s run.sh -w .py,.ipynb
+</span></code></pre><h2 id="installation">Installation<a class="zola-anchor" href="#installation" aria-label="Anchor link for: installation">§</a>
+</h2>
+<p>There are many ways to install <code>lightmon</code>. We recommend using our install script as it is the fastest method.</p>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ curl -sSL https://raw.githubusercontent.com/reaganmcf/lightmon/master/install.sh </span><span style="color:#fe8019;">| </span><span style="color:#fdf4c1;">sh
+</span></code></pre>
+<p>But, we also support other popular package managers if you would rather use them instead:</p>
+<h5 id="cargo"><code>cargo</code><a class="zola-anchor" href="#cargo" aria-label="Anchor link for: cargo">§</a>
+</h5>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ cargo install lightmon
+</span></code></pre><h5 id="arch-aur">Arch AUR<a class="zola-anchor" href="#arch-aur" aria-label="Anchor link for: arch-aur">§</a>
+</h5>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ yay -S lightmon
+</span></code></pre><h2 id="license">License<a class="zola-anchor" href="#license" aria-label="Anchor link for: license">§</a>
+</h2>
+<p><code>lightmon</code> uses the <a href="https://github.com/reaganmcf/lightmon/blob/master/LICENSE">GNU GPL v3.0</a> License</p>
+<h3 id="attributions">Attributions<a class="zola-anchor" href="#attributions" aria-label="Anchor link for: attributions">§</a>
+</h3>
+<div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+
+        </div>
+        
+    
+</div></div>
+            
+    <div class="pagination">
+        <div class="pagination__buttons">
+            </div>
+    </div>
+<footer class="footer">
+                    <div class="footer__inner"><div class="copyright">
+            <span>© 2022 <a href="https://github.com/ejmg/zerm">zerm</a> :: Powered by <a href="https://www.getzola.org/">Zola</a></span>
+            <span>:: Theme made by <a href="https://github.com/ejmg">ejmg</a></span>
+        </div>
+    <script type="text/javascript" src="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;assets&#x2F;js&#x2F;main.js"></script>
+</div>
+                    
+
+                </footer></div>
+    </body>
+</html>

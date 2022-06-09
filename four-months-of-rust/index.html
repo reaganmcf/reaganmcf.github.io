@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>4 months of Rust - what I&#x27;ve learned - Reagan McFarland</title>
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content=""/>
+
+    <meta property="og:title" content="
+    reaganmcf -&nbsp;4 months of Rust - what I&#x27;ve learned" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;four-months-of-rust&#x2F;"/>
+    <meta property="og:description" content="I started learning and using Rust just under 4 months ago. After reading a few books, watching hundreds of videos, and many projects later, here is what I have learned."/><meta property="og:image" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+        <meta property="twitter:card" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+    <link rel="preload" href="/assets/fonts/FiraCode-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/assets/fonts/FiraCode-Bold.woff" as="font" type="font/woff" crossorigin>
+
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;style.css">
+    <link rel="stylesheet" href=" https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;color&#x2F;orange.css">
+    
+</head>
+    <body>
+        <div class="container center">
+<header class="header">
+    <div class="header__inner">
+        <div class="header__logo">
+            <a href="&#x2F;">
+    <div class="logo">
+        rmcf
+    </div>
+</a>
+        </div>
+        <div class="menu-trigger">menu</div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu__inner menu__inner--desktop">
+            
+            
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+                    </li>
+                
+            </ul>
+
+        <ul class="menu__inner menu__inner--mobile">
+            
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+        </li>
+        </ul>
+    </nav>
+
+    </header>
+<div class="content"><div class="post">
+        <h1 class="post-title">
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;four-months-of-rust&#x2F;">4 months of Rust - what I&#x27;ve learned</a>
+        </h1>
+        
+    <div class="post-meta">
+        <span class="post-date">2021.07.17
+                </span>
+
+        <span class="post-author"></span>
+
+        
+
+    
+    :: {<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;categories&#x2F;programming&#x2F;">programming</a>} 
+
+            
+    ::
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;rust&#x2F;">rust</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;review&#x2F;">review</a>
+        
+    
+            
+        
+    </div>
+
+
+
+        
+
+        <div class="post-content">
+            <p>I started learning and using Rust just under 4 months ago. After reading a few books, watching hundreds of videos, and many projects later, here is what I have learned.</p>
+<h2 id="cargo-is-10-10"><code>cargo</code> is 10/10<a class="zola-anchor" href="#cargo-is-10-10" aria-label="Anchor link for: cargo-is-10-10">§</a>
+</h2>
+<p>The utility a powerful package manager and build tool gives you is hard to put into words. Not only is it better than any other package manager that exists for low level programming languages, it is even better than <code>pip</code> and <code>npm</code> in my opinion.</p>
+<ul>
+<li>I've never once had a unknown error while running any <code>cargo</code> command.</li>
+<li>The crate ecosystem is very robust with high quality projects. And since docstrings get automatically hosted on <a href="https://docs.rs">docs.rs</a>, they aren't just packages that are thrown together. Maintainers take pride in their crates and <strong>very rarely</strong> is a crate undocumented.</li>
+<li><code>cargo</code>'s toolchain management system with <code>rustup</code> is about as good as you could ever ask for. You can easily compile for dozens of systems interchangeably, and even specify your own toolchain in <code>json</code> format.</li>
+<li><code>cargo</code>'s built in test suite is a game changer for promoting quality software.</li>
+</ul>
+<h2 id="i-ve-been-writing-unsafe-code-my-whole-life-without-realizing">I've been writing unsafe code my whole life without realizing<a class="zola-anchor" href="#i-ve-been-writing-unsafe-code-my-whole-life-without-realizing" aria-label="Anchor link for: i-ve-been-writing-unsafe-code-my-whole-life-without-realizing">§</a>
+</h2>
+<p>After learning about the <code>unsafe</code> keyword, it really puts in perspective just how unsafe all my non Rust projects have been in the past, whether they were in C, Java, C++, etc.</p>
+<p>For example, when I took OS I remember getting so frustrated with C when working on my <a href="https://github.com/evanwire">partner</a> and I's <a href="https://github.com/reaganmcf/tiny-file-system"><code>ext2</code> file system implementation</a>.
+We spent probably 50 hours on that project, 20 of which were debugging memory issues. Large scale C projects can fall apart quick when UB appears in sections you thought was correct. 
+You can easily become stuck in a large section of code that is very difficult to debug.
+There is so much that can go wrong, and when all you see is <code>Segmentation fault</code> in the output you want to tear your hair out.</p>
+<p>However after using Rust, C was not <em>really</em> to blame - it was us! Pointers <strong>are just inherently dangerous</strong>, especially in file system implementations where you are casting pointers many times to various types and reading / writing directly into memory from files. All of these operations can go south very quickly, and Rust forces you to acknowledge that.</p>
+<p>Now when I go back to C, I find my self being much more careful with how I deal with pointers, explicitly adding comments describing why this operation is safe, just like I would do in Rust.</p>
+<h2 id="helpful-error-messages-make-programming-fun">Helpful error messages make programming fun<a class="zola-anchor" href="#helpful-error-messages-make-programming-fun" aria-label="Anchor link for: helpful-error-messages-make-programming-fun">§</a>
+</h2>
+<p>Anyone who has used Rust for more than 5 minutes has learned first hand just how great the error messages are. Instead of constantly fighting the compiler just to end up with a program that has plenty of runtime issues, <code>Rustc</code> holds your hand,
+giving you very helpful tips when things go wrong. These tips usually include</p>
+<ol>
+<li>What exactly the error is</li>
+<li>A very descriptive breakdown of the error, using the actual contents of your file and highlighting the lines in question</li>
+<li>A suggested fix that is usually correct about 90% of the time</li>
+</ol>
+<p>No more are the days of <code>Segmentation fault</code> with no real guidance on how to fix it besides a line number. I once heard someone describe the compiler as a pair programmer always by your side, and I don't think I can put it in better words.</p>
+<p>As an example, let's take a look at a dangling pointer in C and the error message we get.</p>
+<pre style="background-color:#282828;">
+<code class="language-c" data-lang="c"><span style="color:#fa5c4b;">int </span><span style="color:#8ec07c;">main</span><span style="color:#fdf4c1aa;">()
+{
+  </span><span style="color:#fa5c4b;">int</span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1aa;"> my_ptr;
+  </span><span style="color:#fdf4c1;">some_function(my_ptr)</span><span style="color:#fdf4c1aa;">;
+  </span><span style="color:#fabd2f;">printf</span><span style="color:#fdf4c1;">(</span><span style="color:#b8bb26;">&quot;my pointer is: </span><span style="color:#fdf4c1;">%d</span><span style="color:#b8bb26;">&quot;</span><span style="color:#fdf4c1;">, </span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1;">my_ptr)</span><span style="color:#fdf4c1aa;">;
+}
+
+</span><span style="color:#fa5c4b;">void </span><span style="color:#8ec07c;">some_function</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fa5c4b;">int</span><span style="color:#fe8019;">* </span><span style="color:#fdf4c1;">pointer</span><span style="color:#fdf4c1aa;">) {
+  </span><span style="color:#fa5c4b;">int</span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1aa;"> local </span><span style="color:#fe8019;">= </span><span style="color:#d3869b;">5</span><span style="color:#fdf4c1aa;">;
+  pointer </span><span style="color:#fe8019;">= &amp;</span><span style="color:#fdf4c1aa;">local;
+}
+</span></code></pre>
+<p>Running with <code>gcc -fsanitize=address -O3</code> we get</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">ASAN:DEADLYSIGNAL
+=================================================================
+==46979==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x564cc67208a4 bp 0x564cc6720a20 sp 0x7ffdd2317750 T0)
+==46979==The signal is caused by a READ memory access.
+==46979==Hint: address points to the zero page.
+    #0 0x564cc67208a3 in main (/common/home/rpm141/a.out+0x8a3)
+    #1 0x7fd05438bbf6 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x21bf6)
+    #2 0x564cc6720929 in _start (/common/home/rpm141/a.out+0x929)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/common/home/rpm141/a.out+0x8a3) in main
+==46979==ABORTING
+</span></code></pre>
+<p>Now I don't know about you, but this is <em>kind of gibberish</em>. Can you imagine being a beginner again and trying to debug this? Can you imagine having a 50k line C project and trying to debug this?</p>
+<p>Let's try doing the same thing in Rust.</p>
+<pre style="background-color:#282828;">
+<code class="language-rust" data-lang="rust"><span style="color:#fa5c4b;">fn </span><span style="color:#8ec07c;">main</span><span style="color:#fdf4c1aa;">() {
+  </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> pointer: </span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">i32</span><span style="color:#fdf4c1aa;">;
+  </span><span style="color:#fabd2f;">some_function</span><span style="color:#fdf4c1aa;">(pointer);
+  </span><span style="color:#fabd2f;">print!</span><span style="color:#fdf4c1aa;">(</span><span style="color:#b8bb26;">&quot;my pointer is: </span><span style="color:#fdf4c1;">{}</span><span style="color:#b8bb26;">&quot;</span><span style="color:#fdf4c1aa;">, pointer);
+}
+
+</span><span style="color:#fa5c4b;">fn </span><span style="color:#8ec07c;">some_function</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">pointer</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fa5c4b;">i32</span><span style="color:#fdf4c1aa;">) {
+  </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> local: </span><span style="color:#fa5c4b;">i32 </span><span style="color:#fe8019;">= </span><span style="color:#d3869b;">5</span><span style="color:#fdf4c1aa;">;
+  pointer </span><span style="color:#fe8019;">= &amp;</span><span style="color:#fdf4c1aa;">local;
+}
+</span></code></pre>
+<p>Running <code>cargo check</code> we get</p>
+<pre style="background-color:#282828;">
+<code class="language-rust" data-lang="rust"><span style="color:#fdf4c1aa;">error[</span><span style="color:#fdf4c1;">E0597</span><span style="color:#fdf4c1aa;">]: `local` does not live long enough
+  </span><span style="color:#fe8019;">-</span><span style="color:#fdf4c1aa;">-&gt; src</span><span style="color:#fe8019;">/</span><span style="color:#fdf4c1aa;">main.rs:</span><span style="color:#d3869b;">9</span><span style="color:#fdf4c1aa;">:</span><span style="color:#d3869b;">15
+   </span><span style="color:#fe8019;">|
+</span><span style="color:#d3869b;">7  </span><span style="color:#fe8019;">| </span><span style="color:#fa5c4b;">fn </span><span style="color:#8ec07c;">some_function</span><span style="color:#fdf4c1aa;">(</span><span style="color:#fa5c4b;">mut </span><span style="color:#fdf4c1;">pointer</span><span style="color:#fdf4c1aa;">: </span><span style="color:#fe8019;">&amp;</span><span style="color:#fa5c4b;">i32</span><span style="color:#fdf4c1aa;">) {
+   </span><span style="color:#fe8019;">|                               - </span><span style="color:#fa5c4b;">let&#39;s</span><span style="color:#fdf4c1aa;"> call the lifetime of this reference `</span><span style="color:#fe8019;">&#39;</span><span style="color:#d3869b;">1</span><span style="color:#fdf4c1aa;">`
+</span><span style="color:#d3869b;">8  </span><span style="color:#fe8019;">|     </span><span style="color:#fa5c4b;">let</span><span style="color:#fdf4c1aa;"> local: </span><span style="color:#fa5c4b;">i32 </span><span style="color:#fe8019;">= </span><span style="color:#d3869b;">5</span><span style="color:#fdf4c1aa;">;
+</span><span style="color:#d3869b;">9  </span><span style="color:#fe8019;">|</span><span style="color:#fdf4c1aa;">     pointer </span><span style="color:#fe8019;">= &amp;</span><span style="color:#fdf4c1aa;">local;
+   |     ----------^^^^^^
+   </span><span style="color:#fe8019;">|     |         |
+   |     |</span><span style="color:#fdf4c1aa;">         borrowed value does not live long enough
+   </span><span style="color:#fe8019;">|</span><span style="color:#fdf4c1aa;">     assignment requires that `local` is borrowed </span><span style="color:#fa5c4b;">for</span><span style="color:#fdf4c1aa;"> `</span><span style="color:#fe8019;">&#39;</span><span style="color:#d3869b;">1</span><span style="color:#fdf4c1aa;">`
+</span><span style="color:#d3869b;">10 </span><span style="color:#fe8019;">| </span><span style="color:#fdf4c1aa;">}
+   </span><span style="color:#fe8019;">| -</span><span style="color:#fdf4c1aa;"> `local` dropped here </span><span style="color:#fa5c4b;">while</span><span style="color:#fdf4c1aa;"> still borrowed
+</span></code></pre>
+<p>Look at that error message! It's not just address dumps, it's in <em>english</em>. It's telling us exactly what the issue is, and what the fix is. It's makes programming so much more fun when you aren't stuck in these hard to debug issues with no context.</p>
+<h2 id="the-dev-tools-are-top-notch">The dev tools are top notch<a class="zola-anchor" href="#the-dev-tools-are-top-notch" aria-label="Anchor link for: the-dev-tools-are-top-notch">§</a>
+</h2>
+<p>I've already talked about how great <code>cargo</code> is, but the fantastic devtool suite that comes with Rust doesn't stop with just <code>cargo</code>.</p>
+<p>Rust has enterprise quality plugins for all IDEs, vim, emacs, etc.</p>
+<p>Rust analyzer is faster and more accurate than any other Intellisense engine I've ever used (including typescript's, which is arguably the best on the market).</p>
+<p>Clippy is a cli tool that gives you refactoring suggestions for your code, and is much smarter compared to the other refactoring tools I've used before (like ReSharper). 
+It gives new programmers confidence in the fact that their code is not only correct, but also easy for others to read. 
+This lowers the barrier of entry for contributing to open source projects significantly.</p>
+<p>Rustfmt is the code formatting tool used by practically every single Rust project. It makes every codebase more readable because you are not having to adjust mentally to a new formatting style when you switch projects.</p>
+<h2 id="the-community-is-amazing">The community is amazing<a class="zola-anchor" href="#the-community-is-amazing" aria-label="Anchor link for: the-community-is-amazing">§</a>
+</h2>
+<p>For my last point, I have to point out the Rust community.</p>
+<p>The Rust community is like no other as cliché as it sounds. There are so many fantastic resources, both free and paid, for all levels of Rust programmers. Here is a list of great resources I have used:</p>
+<h4 id="beginner">Beginner<a class="zola-anchor" href="#beginner" aria-label="Anchor link for: beginner">§</a>
+</h4>
+<ul>
+<li><a href="https://doc.rust-lang.org/book/">The Rust Programming Language</a> is the official book for Rust, and is a much lighter read than you would imagine. Definitely worth it.</li>
+<li><a href="https://stevedonovan.github.io/rust-gentle-intro/readme.html">A Gentle Introduction To Rust</a> is another great beginner tutorial to get your feet wet.</li>
+<li><a href="https://discord.com/invite/rust-lang">Rust Discord</a> has channels where beginners can ask any questions, or learn more on how to contribute to the project.</li>
+</ul>
+<h4 id="intermediate">Intermediate<a class="zola-anchor" href="#intermediate" aria-label="Anchor link for: intermediate">§</a>
+</h4>
+<ul>
+<li><a href="https://www.youtube.com/c/jongjengset">Jon Gjengset's YouTube channel</a> has been my favorite resource. He has great tutorials on the harder parts of Rust to wrap your head around like Interior Mutability, Iterators, Macros, etc.</li>
+<li><a href="https://www.youtube.com/user/giard321">JT's Creating a line editor in Rust series</a> is great to see how to build a project from the ground up.</li>
+<li><a href="https://nostarch.com/rust-rustaceans">Rust for Rustaceans</a> is fantastic as well.</li>
+<li><a href="https://arzg.github.io/lang/">Arzg's Make a Language blog posts</a> is great for learning advanced Rust and programming languages.</li>
+<li><a href="https://os.phil-opp.com">Phil Oppermann's &quot;Writing an OS in Rust&quot; blog posts</a> is another great resource for learning advanced Rust and operating systems.</li>
+</ul>
+
+        </div>
+        
+    
+</div></div>
+            
+    <div class="pagination">
+        <div class="pagination__buttons">
+            </div>
+    </div>
+<footer class="footer">
+                    <div class="footer__inner"><div class="copyright">
+            <span>© 2022 <a href="https://github.com/ejmg/zerm">zerm</a> :: Powered by <a href="https://www.getzola.org/">Zola</a></span>
+            <span>:: Theme made by <a href="https://github.com/ejmg">ejmg</a></span>
+        </div>
+    <script type="text/javascript" src="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;assets&#x2F;js&#x2F;main.js"></script>
+</div>
+                    
+
+                </footer></div>
+    </body>
+</html>

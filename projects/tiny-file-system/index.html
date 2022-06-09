@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>tiny-file-system - Reagan McFarland</title>
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content=""/>
+
+    <meta property="og:title" content="
+    reaganmcf -&nbsp;tiny-file-system" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;tiny-file-system&#x2F;"/>
+    <meta property="og:description" content="A small file system inspired by ext2. Written in C using FUSE"/><meta property="og:image" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+        <meta property="twitter:card" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+    <link rel="preload" href="/assets/fonts/FiraCode-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/assets/fonts/FiraCode-Bold.woff" as="font" type="font/woff" crossorigin>
+
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;style.css">
+    <link rel="stylesheet" href=" https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;color&#x2F;orange.css">
+    
+</head>
+    <body>
+        <div class="container center">
+<header class="header">
+    <div class="header__inner">
+        <div class="header__logo">
+            <a href="&#x2F;">
+    <div class="logo">
+        rmcf
+    </div>
+</a>
+        </div>
+        <div class="menu-trigger">menu</div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu__inner menu__inner--desktop">
+            
+            
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+                    </li>
+                
+            </ul>
+
+        <ul class="menu__inner menu__inner--mobile">
+            
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+        </li>
+        </ul>
+    </nav>
+
+    </header>
+<div class="content"><div class="post">
+        <h1 class="post-title">
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;tiny-file-system&#x2F;">tiny-file-system</a>
+        </h1>
+        
+    <div class="post-meta">
+        <span class="post-date">2021.04.04
+                </span>
+
+        <span class="post-author"></span>
+
+        
+
+    
+    :: {<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;categories&#x2F;c&#x2F;">c</a>} 
+
+            
+    ::
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;c&#x2F;">c</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;file-systems&#x2F;">file systems</a>
+        
+    
+            
+        
+    </div>
+
+
+
+        
+
+        <div class="post-content">
+            <p><a href="https://github.com/reaganmcf/tiny-file-system">repository</a></p>
+<h1 id="tiny-file-system">tiny-file-system<a class="zola-anchor" href="#tiny-file-system" aria-label="Anchor link for: tiny-file-system">§</a>
+</h1>
+<p>A small file system inspired by <code>ext2</code> using FUSE, written in C.</p>
+<h2 id="development">Development<a class="zola-anchor" href="#development" aria-label="Anchor link for: development">§</a>
+</h2>
+<p>Before anything, change line 10 in <code>benchmark/simple_test.c</code> to YOUR <code>MOUNTDIR</code> (read below)!</p>
+<p>Use <code>run.sh</code> to run the project. This script automatically does the following:</p>
+<ol>
+<li>Check if TFS is already mounted at <code>MOUNTDIR</code> (defaults to <code>/tmp/&lt;user&gt;/mountdir</code>). If it is, it will unmount it</li>
+<li>Build the project</li>
+<li>It will check that <code>MOUNTDIR</code> is a valid location, and if it doesn't exist it will create it</li>
+<li>Mount TFS at that location</li>
+</ol>
+<p>The ouput is color coded and is verbose with the process in order to ensure reliability, consistency.</p>
+<h3 id="change-mount-point">Change mount point<a class="zola-anchor" href="#change-mount-point" aria-label="Anchor link for: change-mount-point">§</a>
+</h3>
+<p>If you want to mount <code>TFS</code> somewhere else, you can set the <code>MOUNTDIR</code> variable manually, but <strong>make sure it is an absolute path, or the unmount grep match might not work properly!</strong>
+For example, if you wanted to mount at <code>/home/rmcf/someother/mountpont</code>, you would do the following:</p>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ MOUNTDIR=/home/rmcf/someother/mountpoint ./run.sh
+</span></code></pre>
+<p>You must also <strong>change line 10 in <code>benchmark/simple_test.c</code> to the MOUNTDIR specified above!</strong></p>
+<h3 id="lightmon">Lightmon<a class="zola-anchor" href="#lightmon" aria-label="Anchor link for: lightmon">§</a>
+</h3>
+<p>To speed up development and productivity, I recommend using <a href="https://github.com/reaganmcf/lightmon"><code>lightmon</code></a></p>
+<p>This will watch the project for any files ending in <code>.c</code> or <code>.h</code>, and execute <code>./run.sh</code> whenever the files are updated.</p>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ lightmon shell -s run.sh -w .c,.h
+</span></code></pre>
+        </div>
+        
+    
+</div></div>
+            
+    <div class="pagination">
+        <div class="pagination__buttons">
+            </div>
+    </div>
+<footer class="footer">
+                    <div class="footer__inner"><div class="copyright">
+            <span>© 2022 <a href="https://github.com/ejmg/zerm">zerm</a> :: Powered by <a href="https://www.getzola.org/">Zola</a></span>
+            <span>:: Theme made by <a href="https://github.com/ejmg">ejmg</a></span>
+        </div>
+    <script type="text/javascript" src="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;assets&#x2F;js&#x2F;main.js"></script>
+</div>
+                    
+
+                </footer></div>
+    </body>
+</html>

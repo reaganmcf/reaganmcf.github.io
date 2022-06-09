@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>MinesweeperAI - Reagan McFarland</title>
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content=""/>
+
+    <meta property="og:title" content="
+    reaganmcf -&nbsp;MinesweeperAI" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;minesweeper&#x2F;"/>
+    <meta property="og:description" content="Logic based AI Algorithm to solve MineSweeper"/><meta property="og:image" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+        <meta property="twitter:card" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+    <link rel="preload" href="/assets/fonts/FiraCode-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/assets/fonts/FiraCode-Bold.woff" as="font" type="font/woff" crossorigin>
+
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;style.css">
+    <link rel="stylesheet" href=" https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;color&#x2F;orange.css">
+    
+</head>
+    <body>
+        <div class="container center">
+<header class="header">
+    <div class="header__inner">
+        <div class="header__logo">
+            <a href="&#x2F;">
+    <div class="logo">
+        rmcf
+    </div>
+</a>
+        </div>
+        <div class="menu-trigger">menu</div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu__inner menu__inner--desktop">
+            
+            
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+                    </li>
+                
+            </ul>
+
+        <ul class="menu__inner menu__inner--mobile">
+            
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+        </li>
+        </ul>
+    </nav>
+
+    </header>
+<div class="content"><div class="post">
+        <h1 class="post-title">
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;minesweeper&#x2F;">MinesweeperAI</a>
+        </h1>
+        
+    <div class="post-meta">
+        <span class="post-date">2021.03.01
+                </span>
+
+        <span class="post-author"></span>
+
+        
+
+    
+    :: {<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;categories&#x2F;python&#x2F;">python</a>} 
+
+            
+    ::
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;python&#x2F;">python</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;ai&#x2F;">AI</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;logic-engine&#x2F;">logic engine</a>
+        
+    
+            
+        
+    </div>
+
+
+
+        
+
+        <div class="post-content">
+            <p><a href="https://github.com/reaganmcf/MineSweeper">repository</a></p>
+<h1 id="minesweeper">MineSweeper<a class="zola-anchor" href="#minesweeper" aria-label="Anchor link for: minesweeper">§</a>
+</h1>
+<p align="center">
+  <img src="https://github.com/reaganmcf/MineSweeper/raw/main/minesweeper.gif"/>
+</p>
+<p align="center">
+    Logic based AI Algorithms to solve MineSweeper
+</p>
+<!--![](https://github.com/reaganmcf/MineSweeper/raw/main/minesweeper.gif) -->
+<h2 id="usage">Usage<a class="zola-anchor" href="#usage" aria-label="Anchor link for: usage">§</a>
+</h2>
+<h3 id="arguments">Arguments<a class="zola-anchor" href="#arguments" aria-label="Anchor link for: arguments">§</a>
+</h3>
+<table><thead><tr><th>Flag</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>--dim</code></td><td><code>int</code></td><td>Dimension of the minesweeper board</td></tr>
+<tr><td><code>--agent</code></td><td><code>none</code>, <code>basic</code>, <code>advanced</code>, <code>hyper_advanced</code>, <code>bonus_1</code>, <code>bonus_2</code></td><td>Which agent to use</td></tr>
+<tr><td><code>--bomb_count</code></td><td><code>int</code></td><td>Number of bombs to place randomly across the board</td></tr>
+<tr><td><code>--use_stepping</code></td><td><code>bool</code></td><td>Whether or not to use wait for input between agent solving steps. Great for debuging</td></tr>
+<tr><td><code>--quit_when_finished</code></td><td><code>bool</code></td><td>Whether you want pygames window to close when advanced agents are finished</td></tr>
+</tbody></table>
+<h3 id="example">Example<a class="zola-anchor" href="#example" aria-label="Anchor link for: example">§</a>
+</h3>
+<p>Refer to <em>DEVELOPMENT</em> for how to setup virtualenv</p>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ source minesweepervenv/bin/activate
+$ python3 main.py --agent basic --dim 25 --bomb_count 20
+</span></code></pre><h2 id="commands">Commands<a class="zola-anchor" href="#commands" aria-label="Anchor link for: commands">§</a>
+</h2>
+<h3 id="game-commands">Game Commands<a class="zola-anchor" href="#game-commands" aria-label="Anchor link for: game-commands">§</a>
+</h3>
+<table><thead><tr><th>Key</th><th>Function</th></tr></thead><tbody>
+<tr><td><code>RETURN</code></td><td>Open tile the agent is currently t</td></tr>
+<tr><td><code>f</code></td><td>Place flag on tile the agent is currently at</td></tr>
+</tbody></table>
+<h3 id="debugging-commands">Debugging Commands<a class="zola-anchor" href="#debugging-commands" aria-label="Anchor link for: debugging-commands">§</a>
+</h3>
+<table><thead><tr><th>Key</th><th>Function</th></tr></thead><tbody>
+<tr><td><code>s</code></td><td>Hold down to highlight bombs</td></tr>
+<tr><td><code>r</code></td><td>Re-initialize board tiles</td></tr>
+<tr><td><code>n</code></td><td>If <code>--use_stepping</code> flag is set, steps the agent forward one step</td></tr>
+</tbody></table>
+<hr />
+<h2 id="development">Development<a class="zola-anchor" href="#development" aria-label="Anchor link for: development">§</a>
+</h2>
+<h3 id="1-clone-repository-do-this-once">1. Clone Repository (Do this once)<a class="zola-anchor" href="#1-clone-repository-do-this-once" aria-label="Anchor link for: 1-clone-repository-do-this-once">§</a>
+</h3>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ git clone https://github.com/reaganmcf/MineSweeper
+$ cd MineSweeper
+</span></code></pre><h3 id="2-setup-virtual-environment-do-this-once">2. Setup Virtual Environment (Do this once)<a class="zola-anchor" href="#2-setup-virtual-environment-do-this-once" aria-label="Anchor link for: 2-setup-virtual-environment-do-this-once">§</a>
+</h3>
+<ul>
+<li>If you don't have <code>venv</code> installed, run the following<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">python3 -m pip install --user virtualenv
+</span></code></pre></li>
+</ul>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1;">$ python3 -m venv minesweepervenv
+</span></code></pre><h3 id="3-activate-virtual-environemnt-do-this-everytime">3. Activate Virtual Environemnt (Do this everytime)<a class="zola-anchor" href="#3-activate-virtual-environemnt-do-this-everytime" aria-label="Anchor link for: 3-activate-virtual-environemnt-do-this-everytime">§</a>
+</h3>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fabd2f;">source</span><span style="color:#fdf4c1;"> minesweepervenv/bin/activate
+</span></code></pre><h3 id="4-install-packages-do-this-when-you-re-missing-new-libraries-added-to-requirements-txt">4. Install packages (Do this when you're missing new libraries added to <code>requirements.txt</code>)<a class="zola-anchor" href="#4-install-packages-do-this-when-you-re-missing-new-libraries-added-to-requirements-txt" aria-label="Anchor link for: 4-install-packages-do-this-when-you-re-missing-new-libraries-added-to-requirements-txt">§</a>
+</h3>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1aa;">(</span><span style="color:#fdf4c1;">minesweepervenv</span><span style="color:#fdf4c1aa;">)</span><span style="color:#fdf4c1;"> $ pip install -r requirements.txt
+</span></code></pre><h3 id="5-update-requirements-txt-do-this-whenever-you-add-a-new-library-to-the-project-so-the-change-is-reflected-on-github">5. Update <code>requirements.txt</code> (Do this whenever you add a new library to the project so the change is reflected on github)<a class="zola-anchor" href="#5-update-requirements-txt-do-this-whenever-you-add-a-new-library-to-the-project-so-the-change-is-reflected-on-github" aria-label="Anchor link for: 5-update-requirements-txt-do-this-whenever-you-add-a-new-library-to-the-project-so-the-change-is-reflected-on-github">§</a>
+</h3>
+<pre style="background-color:#282828;">
+<code class="language-bash" data-lang="bash"><span style="color:#fdf4c1aa;">(</span><span style="color:#fdf4c1;">minesweepervenv</span><span style="color:#fdf4c1aa;">)</span><span style="color:#fdf4c1;"> $ pip freeze </span><span style="color:#fe8019;">&gt;</span><span style="color:#fdf4c1;"> requirements.txt
+</span></code></pre>
+        </div>
+        
+    
+</div></div>
+            
+    <div class="pagination">
+        <div class="pagination__buttons">
+            </div>
+    </div>
+<footer class="footer">
+                    <div class="footer__inner"><div class="copyright">
+            <span>© 2022 <a href="https://github.com/ejmg/zerm">zerm</a> :: Powered by <a href="https://www.getzola.org/">Zola</a></span>
+            <span>:: Theme made by <a href="https://github.com/ejmg">ejmg</a></span>
+        </div>
+    <script type="text/javascript" src="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;assets&#x2F;js&#x2F;main.js"></script>
+</div>
+                    
+
+                </footer></div>
+    </body>
+</html>

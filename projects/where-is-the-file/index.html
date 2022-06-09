@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <title>where-is-the-file - Reagan McFarland</title>
+    
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content=""/>
+
+    <meta property="og:title" content="
+    reaganmcf -&nbsp;where-is-the-file" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;where-is-the-file&#x2F;"/>
+    <meta property="og:description" content="Version Control from scratch using pthreads, sockets, and a custom protocol to communicate between server and client. Far from perfect, but this was my first large scale C project"/><meta property="og:image" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+        <meta property="twitter:card" content="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;preview_img.png"/>
+    <link rel="preload" href="/assets/fonts/FiraCode-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/assets/fonts/FiraCode-Bold.woff" as="font" type="font/woff" crossorigin>
+
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;style.css">
+    <link rel="stylesheet" href=" https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;color&#x2F;orange.css">
+    
+</head>
+    <body>
+        <div class="container center">
+<header class="header">
+    <div class="header__inner">
+        <div class="header__logo">
+            <a href="&#x2F;">
+    <div class="logo">
+        rmcf
+    </div>
+</a>
+        </div>
+        <div class="menu-trigger">menu</div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu__inner menu__inner--desktop">
+            
+            
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+                    </li>
+                
+                    <li>
+                        <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+                    </li>
+                
+            </ul>
+
+        <ul class="menu__inner menu__inner--mobile">
+            
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;about">about</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io">blog</a>
+        </li>
+        <li>
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects">projects</a>
+        </li>
+        </ul>
+    </nav>
+
+    </header>
+<div class="content"><div class="post">
+        <h1 class="post-title">
+            <a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;projects&#x2F;where-is-the-file&#x2F;">where-is-the-file</a>
+        </h1>
+        
+    <div class="post-meta">
+        <span class="post-date">2020.12.01
+                </span>
+
+        <span class="post-author"></span>
+
+        
+
+    
+    :: {<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;categories&#x2F;c&#x2F;">c</a>} 
+
+            
+    ::
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;c&#x2F;">c</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;pthread&#x2F;">pthread</a>
+        
+    #<a href="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;tags&#x2F;git-clone&#x2F;">git clone</a>
+        
+    
+            
+        
+    </div>
+
+
+
+        
+
+        <div class="post-content">
+            <p><a href="https://github.com/reaganmcf/where-is-the-file">repository</a></p>
+<h1 id="where-is-the-file">Where is the file<a class="zola-anchor" href="#where-is-the-file" aria-label="Anchor link for: where-is-the-file">§</a>
+</h1>
+<p>A basic version control system written from scratch with sockets and file descriptors. There are countless optimizations that can be made, but the general structure of the code is sound.</p>
+<p>Note: <strong>Client repository copies are stored in the CWD such as <code>./project/</code>, <code>./my_cool_project/</code>, etc. Server repositories are stored in the <code>./Projects/</code> folder.</strong></p>
+<h2 id="implementation-server-and-client">Implementation (Server and Client)<a class="zola-anchor" href="#implementation-server-and-client" aria-label="Anchor link for: implementation-server-and-client">§</a>
+</h2>
+<p>Since this project is complex, many of the building blocks need to be very robust for it to work as intended. Because of this, we made sure to create a detailed <code>.Manifest</code> structure for the client, as well as Protocol to communicate back and forth between the <code>CLIENT</code> and <code>SERVER</code> as reliably as possible. We go into more depth about how these are structured below.</p>
+<p>Since we had to make the server multi-threaded, we made sure to keep in mind the issues that can arise from this type of design. Most importantly, 2 threads operating at the same time. We needed the functionality of locking the reository at any given time for any given thread, but locking the entire project directory is too overkill. So, we decided to create a linked list of <code>RepositoryLocks</code> that give us a way to assign a lock to a particular repository.</p>
+<pre style="background-color:#282828;">
+<code class="language-c" data-lang="c"><span style="color:#fa5c4b;">typedef struct</span><span style="color:#fdf4c1aa;"> _repository_lock {
+  </span><span style="color:#fabd2f;">pthread_mutex_t</span><span style="color:#fdf4c1aa;"> lock;
+  </span><span style="color:#fa5c4b;">char </span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1aa;">project_name;
+  </span><span style="color:#fa5c4b;">struct</span><span style="color:#fdf4c1aa;"> _repository_lock </span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1aa;">next;
+} </span><span style="color:#8ec07c;">RepositoryLock</span><span style="color:#fdf4c1aa;">;
+</span></code></pre>
+<p>These <code>RepositoryLocks</code> get init'd at the start, and get locked accordingly throughout the codebase, whenever a particular function needs to lock the project. </p>
+<p>Since the server doesn't exit when it finishes handling a connection, memory allocation has to be tracked carefully. Due to the modularization of how we structured our project, as described in the next few paragraphs, this was much easier to debug since we made sure to keep it in mind from the start.</p>
+<p>When the server does exit, crash, or recieves SIGINT, we also made sure to properly intercept these by using <code>atexit()</code> and <code>signal()</code>. If any of these happen, it will make sure to <code>pthread_mutex_destory</code> all <code>RepositoryLocks</code> and stop listening for incoming connections before terminating the process.</p>
+<p>Another decision we had to make also was dealing with version numbers after <code>push()</code> is handeled by the server. The instructions state the commit <strong>does not contain version numbers</strong>, which means that the server has no idea what to write the new files to the .Manifest as, so we decided to <strong>reset all file version numbers ot 1 for both the client and server</strong> after a successful push.</p>
+<hr />
+<p>Our client had to be modular to allow for a readable codebase when the project is as complex and large as this one. For this, we made sure to abstract out common functions, such as <code>hash_file(char* file_path)</code>, <code>fetch_client_manifest(char* project_name)</code>, <code>fetch_server_manifest(char* project_name)</code>, and more. This greatly reduces the amount of code we have to write on the client side and allows for a much more stable program as we don't have to make the same change in multiple locations.</p>
+<p>Another aspect of the client that we made sure to get down perfect was how we handle connections. Almost every function has to communicate with the server, so writing a function handler for creating and retrieving a connection, while handling all errors and edge cases that can happen, was essential.</p>
+<p>We accomplised this by creating a custom <code>wtf_connection</code> data structure that stores the information we need to read and write from the server at any time.</p>
+<pre style="background-color:#282828;">
+<code class="language-c" data-lang="c"><span style="color:#fa5c4b;">typedef struct</span><span style="color:#fdf4c1aa;"> _wtf_connection {
+  </span><span style="color:#fa5c4b;">int</span><span style="color:#fdf4c1aa;"> socket;
+  </span><span style="color:#fa5c4b;">struct</span><span style="color:#fdf4c1aa;"> sockaddr_in address;
+  </span><span style="color:#fa5c4b;">struct</span><span style="color:#fdf4c1aa;"> hostent </span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1aa;">host;
+  </span><span style="color:#fa5c4b;">int</span><span style="color:#fdf4c1aa;"> port;
+  </span><span style="color:#fa5c4b;">int</span><span style="color:#fdf4c1aa;"> len;
+} </span><span style="color:#8ec07c;">wtf_connection</span><span style="color:#fdf4c1aa;">;
+</span></code></pre>
+<p>Even better, we created a function called <code>wtf_connect</code> that will read from the <code>.configuration</code> file, attempt to establish a connection, and error check the entire process printing errors to STDOUT when needed. If the connection was successful, it returns a <code>wtf_connection*</code> which we can use anywhere. Example:</p>
+<pre style="background-color:#282828;">
+<code class="language-c" data-lang="c"><span style="color:#fdf4c1aa;">wtf_connection</span><span style="color:#fe8019;">*</span><span style="color:#fdf4c1aa;"> new_connection </span><span style="color:#fe8019;">= </span><span style="color:#fdf4c1;">wtf_connect()
+</span><span style="color:#fa5c4b;">char</span><span style="color:#fdf4c1aa;"> buffer[</span><span style="color:#d3869b;">50</span><span style="color:#fdf4c1aa;">];
+</span><span style="color:#fdf4c1;">memset(buffer, </span><span style="color:#d3869b;">0</span><span style="color:#fdf4c1;">, </span><span style="color:#d3869b;">50</span><span style="color:#fdf4c1;">)</span><span style="color:#fdf4c1aa;">;
+</span><span style="color:#fdf4c1;">sprintf(buffer, </span><span style="color:#b8bb26;">&quot;18:my message to send&quot;</span><span style="color:#fdf4c1;">)</span><span style="color:#fdf4c1aa;">;
+</span><span style="color:#fdf4c1;">write(new_connection-&gt;socket, buffer, </span><span style="color:#fabd2f;">strlen</span><span style="color:#fdf4c1;">(buffer))</span><span style="color:#fdf4c1aa;">;
+</span><span style="color:#fdf4c1;">close(new_connection-&gt;socket)</span><span style="color:#fdf4c1aa;">;
+</span><span style="color:#fdf4c1;">free(new_connection)</span><span style="color:#fdf4c1aa;">;
+</span></code></pre>
+<p>Now that we had connections and generalized functions sorted out, we needed to create a plan for handling each function input. We modularized this as much as we could by making sure <code>int main()</code> doesn't <code>malloc()</code> or do any heavy lifting, but just checks the input commands, and passes the values in <code>argv</code> to the specific function. We split up each comamnd into its own function with the format of <code>wtf_push(char* project_name)</code>, <code>wtf_commit(char* project_name)</code>, etc. This made <code>free()</code>ing any memory we allocated much easier to track, and allowed us to free all of our memory without much debugging.</p>
+<h3 id="history">History<a class="zola-anchor" href="#history" aria-label="Anchor link for: history">§</a>
+</h3>
+<p>The repository contains a <code>.History</code> file that shows all of the operations that occurred throughout the history of the project. After push, it will show the new version number, as well as what operations occurred for <em>this</em> version.</p>
+<p><code>rollback</code> also appends a line detailing the action in <code>.History</code></p>
+<h3 id="protocol">Protocol<a class="zola-anchor" href="#protocol" aria-label="Anchor link for: protocol">§</a>
+</h3>
+<p>Since networking has reading unknown length of bytes as a core fundamental of networking operations, we made sure to design our protocol with a way to properly handle this in mind. We accomplished this by sending the length of the information before the information itself, allowing the server to allocate exactly the space it needs.</p>
+<ol>
+<li>Send length of command</li>
+<li>Send command name</li>
+<li>For the rest of the params, send length followed by data</li>
+</ol>
+<p>Example:
+<code>14:create_project:10:project1.1</code>
+<code>19:get_current_version:8:project</code></p>
+<h3 id="manifest-structure">Manifest Structure<a class="zola-anchor" href="#manifest-structure" aria-label="Anchor link for: manifest-structure">§</a>
+</h3>
+<p>Since we felt that the original .Manifest file structure listed was limiting, we decided to design our own <code>.Manifest</code> file structure. <em>Note: this was approved by an instructor on Piazza, question @371</em>.</p>
+<p>Manifests are in the following format</p>
+<pre style="background-color:#282828;">
+<code><span style="color:#fdf4c1aa;">&lt;project_name&gt;
+&lt;version_number&gt;
+~ &lt;A/D&gt;:&lt;file_path:name&gt;:&lt;file_current_version&gt;:&lt;file_hash&gt;:!
+~ &lt;file_path:name&gt;:&lt;file_current_version&gt;:&lt;file_hash&gt;:
+~ &lt;A/D&gt;:&lt;file_path:name&gt;:&lt;file_current_version&gt;:&lt;file_hash&gt;:!
+</span></code></pre>
+<p>If a file entry has <code>!</code> at the end, then it means that the server has not seen it.</p>
+<p>We compute the <code>file_hash</code> using <code>SHA1()</code> from the  OpenSSL Library.</p>
+
+        </div>
+        
+    
+</div></div>
+            
+    <div class="pagination">
+        <div class="pagination__buttons">
+            </div>
+    </div>
+<footer class="footer">
+                    <div class="footer__inner"><div class="copyright">
+            <span>© 2022 <a href="https://github.com/ejmg/zerm">zerm</a> :: Powered by <a href="https://www.getzola.org/">Zola</a></span>
+            <span>:: Theme made by <a href="https://github.com/ejmg">ejmg</a></span>
+        </div>
+    <script type="text/javascript" src="https:&#x2F;&#x2F;reaganmcf.github.io&#x2F;assets&#x2F;js&#x2F;main.js"></script>
+</div>
+                    
+
+                </footer></div>
+    </body>
+</html>
