@@ -1,6 +1,6 @@
 +++
 title="nakala"
-description="A hobby programming language in Rust"
+description="A dynamic programming language designed to feel familiar and be fun to use, written in Rust"
 date=2021-07-01
 
 [taxonomies]
@@ -8,89 +8,44 @@ tags = ["rust", "nakala", "programming languages"]
 categories = ["rust"]
 +++
 
-[repository](https://github.com/reaganmcf/nakala)
+[repository](https://github.com/nakala-lang/nakala)
 
 # nakala
 
-A programming language that I built based on [azrg's Eldiro blog posts](https://arzg.github.io/lang/). The core design and architecture are all practically identical to Eldiro, hence the name of the project: nakala (Punjabi for _mimic_). If you haven't read through his blog posts, I highly recommend you do because it is an unmatched learning resource.
+<p align="center">
+  <img src="https://github.com/nakala-lang/nakala/raw/main/assets/new_logo.png" width="500px"/>
+</p>
 
 ### Why make nakala?
-I was so inspired by his blog posts that I have decided to continue the implementation that I made while reading his posts. 
 
-The most notable of which being:
-- Creating a runtime engine that computes the parsed `HIR` representation
-- Adding many more language features (such as variable references, code blocks, and string literals)
-- CLI Runtime/REPL. 
+> Note: see _History_
 
-## Features
-As nakala is in its very early stages, the language does not have many features. However, it does have:
+After learning about progrmaming languages for over a year (including books, college level courses, multiple side projects, etc.), I've decided I want to make my own, general purpose programming language.
 
-#### Binary Expressions
-Prefix, Infix, and Postfix binary expression support
-```
-1 + 4 * 10 + -4
+### Philosophy
 
-200 + (5 * (100 + 4))
-```
+Nakala only has two core values:
 
-#### Comments
-You can have comments placed within expressions
-```
-1 
-+ 123 # add a medium number
-+ 5512312 # add a large number
-```
+1. The syntax should feel familiar, while remaining unique
+2. Nakala doesn't try to do anything _really hard_, as I want to make working on this project fun and not another job that ends up burning me out.
 
-#### Variable Declaration and References
-```
-let a = 200 + (5 * (100 + 4))
+### Roadmap
 
-let b = a
-```
+[Please checkout the repoistory](https://github.com/nakala-lang/nakala) for progress and roadmap
 
-#### Code Blocks
-```
-let x = {
-  # first let's declare a variable
-  let temp = 100
+### Contributing
+I am always welcoming PRs and would love to work on the project with other people if they are interested. There are no rules, and I will accept any PR as long as it aligns with the projects core values as described above.
 
-  # now lets create another variable
-  let temp2 = 500
+---
 
-  # add them together. The final statement in a block is the value returned
-  temp + temp2
-}
-```
+#### History
 
-#### Strings
-```
-let x = "Hello, World!"
-```
+Nakala started as a programming language that I built based on [arzg's Eldiro blog posts](https://arzg.github.io/lang/). 
+The core architecture (especially the Parser) was practically identical to Eldiro, hence the name of the project: nakala (Punjabi for _mimic_).
+If you haven't read through his blog posts, I highly recommend you do because it is an unmatched learning resource.
 
-#### `.nak` File Format
+I ended up scrapping the entire language and implementation for something I built from the ground up after studying more. However, I decided to keep the name as a nod to arzg for lighting a spark in me that put me on a journey of learning constantly.
 
-You can store a nakala program in a `.nak` file and run it using the CLI tool. For example:
+#### License
+`nakala` uses the MIT License
 
-```
-# my_program.nak
-
-let x = 100
-
-let y = x + 5
-
-x + y
-```
-
-You can then run this program with the following command
-
-```
-$ nakala my_program.nak
-
-110
-```
-
-## Project Layout
-There are a fair amount of moving parts, and just like azrg, I have also split up all the components into separate crates. Below is a dependency graph to visualize how it all links together:
-<p align="center" style="width: 90%; margin: auto; margin-top: 20px">
-  <img src="https://raw.githubusercontent.com/reaganmcf/nakala/main/assets/graph.svg"/>
-</p>
